@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context-4.2.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+        http://www.springframework.org/schema/mvc 
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+  
+<!--  Annotation-based configuration --> 
+	<context:component-scan base-package="com.springlab.biz.board, com.springlab.biz.user" />
+   	<context:property-placeholder location="/WEB-INF/config/db/dbinfo.properties" />
+  	<aop:aspectj-autoproxy />
+   	<tx:annotation-driven transaction-manager="txManager" />
+
+	   
+    <mvc:resources mapping = "/resources/**" location="/resources/" />
+	<mvc:resources mapping = "/upload/**" location="/upload/" />
+	<mvc:annotation-driven/>
+	
+	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource">
+		<property name="driverClassName" value="${jdbc.driver}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.user}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean>
+	
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+	
+	<!-- Controller Beans -->
+	<!-- <bean id="login" class="com.springlab.biz.board.controller.LoginController" />
+	<bean id="getBoardList" class="com.springlab.biz.board.controller.GetBoardListController" />
+	<bean id="getBoard" class="com.springlab.biz.board.controller.GetBoard" />
+	<bean id="deleteBoard" class="com.springlab.biz.board.controller.DeleteBoardController" />
+	<bean id="insertBoard" class="com.springlab.biz.board.controller.InsertBoardController" />
+	<bean id="logout" class="com.springlab.biz.board.controller.LogoutController" />
+	<bean id="updateBoard" class="com.springlab.biz.board.controller.UpdateBoardController" />
+
+	Request Handler Mapping Bean
+	
+	<bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+		<property name="mappings">
+			<props>
+				/login 요청이 오면 bean login을 mapping해라
+				<prop key="/login">login</prop>
+				<prop key="/getBoardList">getBoardList</prop>
+				<prop key="/getBoard">getBoard</prop>
+				<prop key="/deleteBoard">deleteBoard</prop>
+				<prop key="/insertBoard">insertBoard</prop>
+				<prop key="/logout">logout</prop>
+				<prop key="/updateBoard">updateBoard</prop>
+			</props>
+		</property>
+	</bean>
+ -->	
+	<!-- View Resolver Bean -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/view/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+	
+	<bean id="multipartResolver" class="org.springframework.web.multipart.support.StandardServletMultipartResolver"></bean>
+	
+	
+	<!-- <bean id="exceptionResolver" class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<property name="exceptionMappings">
+			<props>
+				<prop key="java.lang.ArithmeticException">error/arithmeticException</prop>
+				<prop key="java.lang.IllegalArgumentException">error/illegalArgumentException</prop>
+			</props>
+		</property>
+		<property name="defaultErrorView" value="error/error" />
+
+	</bean> -->
+	<bean id="sqlSessionFactory" class = "org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="configLocation" value = "classpath:mybatis/mybatis-config.xml" />
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg ref="sqlSessionFactory" />
+	</bean>
+</beans>
